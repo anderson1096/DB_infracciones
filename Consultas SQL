@@ -1,0 +1,73 @@
+create database Proyecto;
+
+use Proyecto;
+
+create table Agente(
+Id_Agente INTEGER NOT NULL,
+Nombre_Agente VARCHAR(30) NOT NULL,
+Apellido_Agente VARCHAR(30) NOT NULL,
+PRIMARY KEY (Id_Agente)
+);
+
+create table Persona(
+Id_Persona INTEGER NOT NULL,
+Nombre_Persona VARCHAR(30) NOT NULL,
+Apellido_Persona VARCHAR(30) NOT NULL,
+Direccion_Persona VARCHAR(50) NOT NULL,
+Fecha_Nacimiento DATE,
+Tipo_Perona VARCHAR (30) NOT NULL,
+PRIMARY KEY (Id_Persona)
+);
+
+create table Vehiculo(
+Matricula INTEGER NOT NULL,
+Modelo_Vehiculo VARCHAR(30) NOT NULL,
+Marca_Vehiculo VARCHAR(30) NOT NULL,
+Fecha_Matriculacion DATE NOT NULL,
+Id_Propietario INTEGER,
+PRIMARY KEY (Matricula),
+FOREIGN KEY (Id_Propietario) REFERENCES Persona(Id_Persona)ON DELETE CASCADE ON UPDATE CASCADE 
+);
+
+create table Lugar_Infraccion(
+Id_Lugar_infraccion INTEGER AUTO_INCREMENT NOT NULL,
+Carretera VARCHAR(30) NOT NULL,
+Kilometro INTEGER NOT NULL,
+Direccion VARCHAR(30) NOT NULL,
+PRIMARY KEY (Id_Lugar_infraccion)
+);
+
+create table Multa(
+Id_Multa INTEGER NOT NULL,
+Fecha_Multa DATE NOT NULL,
+Importe_Multa INTEGER NOT NULL,
+Articulo_Sancionado VARCHAR(30) NOT NULL,
+Id_Persona INTEGER,
+Id_Vehiculo INTEGER,
+Id_Lugar_Infraccion INTEGER,
+Id_Agente INTEGER,
+PRIMARY KEY (Id_Multa),
+FOREIGN KEY (Id_Persona) REFERENCES Persona(Id_Persona)ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (Id_Vehiculo) REFERENCES Vehiculo(Matricula)ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (Id_Lugar_Infraccion) REFERENCES Lugar_Infraccion(Id_Lugar_Infraccion)ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (Id_Agente) REFERENCES Agente(Id_Agente)ON DELETE CASCADE ON UPDATE CASCADE   
+);
+
+INSERT INTO Agente VALUES (1088345765,'Carlos','Serna');
+INSERT INTO Agente VALUES (1088345743,'Camilo','VAlencia');
+INSERT INTO Agente VALUES (1088232165,'Oscar','Montoya');
+
+INSERT INTO Persona VALUES (1088311092,'Maria','Loopez','Calle 1 mnz 3','1980/11/5','Propietario');
+INSERT INTO Persona VALUES (1088214092,'MArio','Henao','Calle 7 mnz 3','1980/04/5','Peaton');
+INSERT INTO Persona VALUES (1088312486,'Camila','Salazar','Calle 1 mnz 8','1996/12/24','Propietario');
+
+INSERT INTO Vehiculo VALUES (1234,'Caminos','Chevrolet','1999/11/5',1088311092);
+INSERT INTO Vehiculo VALUES (1224,'Fiat','Chevrolet','2005/10/15',1088312486);
+
+INSERT INTO Lugar_Infraccion VALUES ('Sur','4','calle 50');
+INSERT INTO Lugar_Infraccion VALUES ('Pinares','8','calle58');
+
+INSERT INTO Multa VALUES  (1,'2015/10/03',300000,'segundo',1088311092,1234,1,1088345765);
+INSERT INTO Multa VALUES  (2,'2010/04/03',900000,'tercero',1088214092,NULL,2,1088232165);
+
+select * from Multa;
