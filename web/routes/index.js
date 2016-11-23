@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
-
+var login = require('./views/login')
 
 /*------------ DATABASE CONNECTION ----------------*/
 var connection = mysql.createConnection({
@@ -32,6 +32,12 @@ router.get('/', function(req, res, next) {
 
   })
 
+});
+
+
+/* GET home page. */
+router.get('/users', function(req, res, next) {
+  res.render('login');
 });
 
 module.exports = router;
