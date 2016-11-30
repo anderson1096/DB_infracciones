@@ -21,85 +21,14 @@ connection.connect(function(err,res){
 
 /*-------------------------------------------------*/
 
+
+/*-------------- ENRUTAMIENTOS ---------------------------*/
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-  connection.query('SELECT * FROM Persona',function(err,result){
-    if(err){
-      throw err;
-    }
-    res.render('index', { title: result[0].Apellido_Persona});
-
-  })
-
+  res.render('index');
 });
-
-
-/* Recibir LOGIN */
-router.post('/login',function(req,res,next){
-  try{
-    var obj = req.body;
-    if(obj.login_pass == '1096'){
-      res.render('index', { title: 'Anderson10'});
-    }else{
-      res.render('index', { title: 'Error'});
-    }
-  }
-  catch(ex){
-    console.error("Internal error:" + ex);
-    return next(ex);
-  }
-});
-
-
-/* Recibir CONSULTA */
-router.post('/consult',function(req,res,next){
-  try{
-    var obj = req.body;
-
-    con1 = 'SELECT * FROM Multa WHERE id_persona = ?';
-    con2 = 'SELECT * FROM Persona WHERE id_persona = ?';
-    con3 = 'SELECT * FROM Vehiculo WHERE matricula_vehiculo = ?';
-    //code_int = parseInt(obj.user_code);
-    connection.query(con1,[obj.user_code],function(err, multa_result){
-      if(err){
-        throw err;
-      }
-      connection.query(con2,[obj.user_code],function(err, persona_result){
-        if(err){
-          throw err;
-        }
-        var tam = Object.keys(multa_result).length;
-        var vehiculo = [];
-        multa_result.forEach(function(multa){
-            connection.query(con3,[multa.id_vehiculo],function(err, vehiculo_result){
-              if(err){
-                throw err;
-              }
-
-
-              /*car_descr = "Matricula: " + vehiculo_result[0].matricula_vehiculo
-                            + " Modelo: " + vehiculo_result[0].modelo_vehiculo
-                            + " Marca: " + vehiculo_result[0].marca_vehiculo;*/
-              vehiculo.push(vehiculo_result[0]);
-
-
-
-            })
-          })
-          res.render('consult',{multa: multa_result, persona: persona_result, vehiculos: vehiculo});
-      })
-
-    })
-  }
-  catch(ex){
-    console.error("Internal error:" + ex);
-    return next(ex);
-  }
-});
-
-
-
 
 /* GET login page. */
 router.get('/login', function(req, res, next) {
@@ -114,6 +43,72 @@ router.get('/login_consult', function(req, res, next) {
 /* GET consult page */
 router.get('/consult', function(req, res, next) {
   res.render('consult');
+});
+
+/*--------------------------------------------------------*/
+
+
+
+/* Recibir LOGIN */
+router.post('/login',function(req,res,next){
+  try{
+    var obj = req.body;
+    if(obj.login_pass == 'root' && obj.login_user == 'root'){
+      res.redirect('/');
+    }else{
+      res.redirect('/');
+    }
+  }
+  catch(ex){
+    console.error("Internal error:" + ex);
+    return next(ex);
+  }
+});
+
+
+
+/* Recibir CONSULTA  */
+router.post('/consult',function(req,res,next){
+  try{
+
+      var obj = req.body;
+      con = 'SELECT M.id_multa, M.fecha_multa, M.importe_multa, M.id_vehiculo, M.articulo_multa, L.carretera_lugarInfraccion,L.kilometro_lugarInfraccion, L.dir_lugarInfraccion, P.id_persona, P.nombre_persona, P.apellido_persona, A.id_agente, A.nombre_agente, A.apellido_agente FROM Persona as P, Multa as M, Lugar_Infraccion as L, Agente as A WHERE M.id_persona = ? AND P.id_persona = ? AND M.id_lugarInfraccion = L.id_lugarInfraccion AND A.id_agente = M.id_agente';
+      con_modelo = 'SELECT IF(M.id_persona = ? AND M.id_vehiculo IS NOT NULL,(select V.modelo_vehiculo from Vehiculo as V WHERE V.matricula_vehiculo = M.id_vehiculo), "No Aplica") as result FROM Multa as M WHERE M.id_persona IN (SELECT Multa.id_persona FROM Multa WHERE Multa.id_persona = ?)';
+      con_marca = 'SELECT IF(M.id_persona = ? AND M.id_vehiculo IS NOT NULL,(select V.marca_vehiculo from Vehiculo as V WHERE V.matricula_vehiculo = M.id_vehiculo), "No Aplica") as result FROM Multa as M WHERE M.id_persona IN (SELECT Multa.id_persona FROM Multa WHERE Multa.id_persona = ?)';
+      con_matricula = 'SELECT IF(M.id_persona = ? AND M.id_vehiculo IS NOT NULL,(select V.matricula_vehiculo from Vehiculo as V WHERE V.matricula_vehiculo = M.id_vehiculo), "No Aplica") as result FROM Multa as M WHERE M.id_persona IN (SELECT Multa.id_persona FROM Multa WHERE Multa.id_persona = ?)';
+      connection.query(con,[obj.user_code, obj.user_code],function(err, multa_res){
+          if(err){
+            throw err;
+          }
+          connection.query(con_matricula,[obj.user_code, obj.user_code],function(err, matricula_result){
+            if(err){
+              throw err;
+            }else{
+              connection.query(con_modelo,[obj.user_code, obj.user_code],function(err, modelo_result){
+                if(err){
+                  throw err;
+                }else{
+                    connection.query(con_marca,[obj.user_code,obj.user_code],function(err, marca_result){
+                      if(err){
+                        throw err;
+                      }else{
+                        res.render('consult',{multa: multa_res, marca: marca_result, modelo: modelo_result, a: 0, matricula: matricula_result});
+                      }
+                    });
+                }
+              });
+            }
+          });
+
+
+      });
+    }
+
+
+  catch(ex){
+    console.error("Internal error:" + ex);
+    return next(ex);
+  }
 });
 
 
