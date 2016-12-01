@@ -1,6 +1,6 @@
 <% include header %>
 <body background-color = 'teal'>
-<% include nav-bar %>
+<% include nav_bar_root %>
   <div class="container">
     <table class="bordered centered highlight responsive-table">
       <thead class="center s6">
@@ -33,26 +33,27 @@
     </table>
     </div>
     <form action="/update_person" method="post">
+      <center>
+        <div class="row">
+          <div class="input-field col s6">
+            <input value="" id="first_name2" type="text" class="validate" name="id" >
+            <label class="active" for="first_name2">Numero de identificaccionde</label>
+        </div>
+      </div>
       <div class="row">
         <div class="input-field col s6">
-          <input value="" id="first_name2" type="text" class="validate" name="id" >
-          <label class="active" for="first_name2">Numero de identificaccionde</label>
+          <input value="" id="first_name2" type="text" class="validate" name="columna" >
+          <label class="active" for="first_name2">Nombre de la columna (ejm: Nombre, Apellido..)</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s6">
-        <input value="" id="first_name2" type="text" class="validate" name="columna" >
-        <label class="active" for="first_name2">Nombre de la columna (ejm: Nombre, Apellido..)</label>
+        <input value="" id="first_name2" type="text" class="validate" name="inf" >
+        <label class="active" for="first_name2">Nueva informacion</label>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="input-field col s6">
-      <input value="" id="first_name2" type="text" class="validate" name="inf" >
-      <label class="active" for="first_name2">Nueva informacion</label>
-  </div>
-</div>
-    <input type = "submit" class="btn btn-primary btn-large btn-block " href= "/update_person"value="Actualizar">
-    <a class="login-link" href="/root">Regresar</a>
+  </center>
+   <input type = "submit" class="btn btn-primary btn-large btn-block " href= "/update_person"value="Actualizar">
   </form>
 
 </body>

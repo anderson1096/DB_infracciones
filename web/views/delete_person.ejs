@@ -1,6 +1,6 @@
 <% include header %>
 <body background-color = 'teal'>
-<% include nav-bar %>
+<% include nav_bar_root %>
   <div class="container">
     <table class="bordered centered highlight responsive-table">
       <thead class="center s6">
@@ -33,13 +33,14 @@
     </table>
     </div>
     <form action="/delete_person" method="post">
-      <div class="row">
-        <div class="input-field col s6">
-          <input value="" id="first_name2" type="text" class="validate" name="id" >
-          <label class="active" for="first_name2">Ingresa el numero de identificaccion</label>
-      </div>
-    </div>
+      <center>
+        <div class="row">
+          <div class="input-field col s6">
+            <input value="" id="first_name2" type="text" class="validate" name="id" >
+            <label class="active" for="first_name2">Ingresa el numero de identificaccion</label>
+          </div>
+        </div>
+      </center>
     <input type = "submit" class="btn btn-primary btn-large btn-block " href= "/delete_persont"value="Eliminar">
-    <a class="login-link" href="/root">Regresar</a>
   </form>
 </body>

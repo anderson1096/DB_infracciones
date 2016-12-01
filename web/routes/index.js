@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
+var dialog = require('dialog');
 
 
 /*------------ DATABASE CONNECTION ----------------*/
@@ -92,7 +93,9 @@ router.post('/login',function(req,res,next){
     if(obj.login_pass == 'root' && obj.login_user == 'root'){
       res.redirect('/root')
     }else{
-      res.render('error');
+      dialog.info('Usuario incorrecto', 'Error!', function(err){
+        if (!err) console.log('User clicked OK');
+      })
     }
   }
   catch(ex){
@@ -153,30 +156,40 @@ router.post('/update_person',function(req,res,next){
   try {
     var obj = req.body;
     var id = obj.id;
+    if (obj.columna == 'Identificacion'){
+      var data = {id_persona: obj.inf};
+      var possible = true;
+    }
     if (obj.columna == 'Nombre'){
       var data = {nombre_persona: obj.inf};
+      var possible = true;
     }
     if (obj.columna == 'Apellido'){
       var data = {apellido_persona: obj.inf};
+      var possible = true;
     }
     if (obj.columna == 'Direccion'){
       var data = {direccion_persona: obj.inf};
+      var possible = true;
     }
     if (obj.columna == 'Fecha de nacimiento'){
       var data = {fecha_nacimiento: obj.inf};
+      var possible = true;
     }
     if (obj.columna == 'Tipo'){
       var data = {tipo_persona: obj.inf};
+      var possible = true;
     }
 
+    if (possible == true){
     up = 'UPDATE Persona SET ? WHERE id_persona = ?';
-    connection.query(up, [data, id],function(err,result){
-      if(err){
-        throw err;
-      }
-      console.log("se realizo la actualizacion");
-    });
-
+      connection.query(up, [data, id],function(err,result){
+        if(err){
+          throw err;
+        }
+        console.log("se realizo la actualizacion");
+      });
+    }
     //vuelve a cargar la pagina con datos actualizados
     consult = 'SELECT * FROM Persona';
     connection.query(consult,function(err,result){
@@ -224,9 +237,10 @@ router.post('/delete_person',function(req,res,next){
 router.post('/register_mult',function(req,res,next){
   try {
     var obj = req.body;
+
     var id = obj.id.replace(/[^0-9]/g, '');
     //datos y conexion a la tabla persona
-    if (obj.person == 'no'){
+    if (obj.person == 'no' ){
       var data_person = {id_persona: id, nombre_persona: obj.name, apellido_persona: obj.last_name, direccion_persona: obj.dir, fecha_nacimiento: obj.date_person, tipo_persona: obj.tipo};
       ins = 'INSERT INTO Persona SET ?';
       connection.query(ins,data_person,function(err, res){
@@ -282,12 +296,10 @@ router.post('/register_mult',function(req,res,next){
 
 //Pagina root
 router.post('/root',function(req,res,next){
-  console.log(req.body.boton);
   if(req.body.boton == 'Ingresar Multa'){
     res.redirect('/register_mult');
   }
   if(req.body.boton == 'Eliminar Persona'){
-    console.log("ingreso al segundo if");
     res.redirect('/delete_person');
   }
   if(req.body.boton == 'Actualizar datos de persona'){
