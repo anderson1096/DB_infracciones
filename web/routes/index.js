@@ -97,6 +97,7 @@ router.post('/login',function(req,res,next){
       dialog.info('Usuario incorrecto', 'Error!', function(err){
         if (!err) console.log('User clicked OK');
       })
+      res.render('login')
     }
   }
   catch(ex){
