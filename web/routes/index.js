@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 var dialog = require('dialog');
+var validator = require('validator');
 
 
 /*------------ DATABASE CONNECTION ----------------*/
@@ -155,40 +156,44 @@ router.post('/consult',function(req,res,next){
 router.post('/update_person',function(req,res,next){
   try {
     var obj = req.body;
-    var id = obj.id;
-    if (obj.columna == 'Identificacion'){
-      var data = {id_persona: obj.inf};
-      var possible = true;
-    }
-    if (obj.columna == 'Nombre'){
-      var data = {nombre_persona: obj.inf};
-      var possible = true;
-    }
-    if (obj.columna == 'Apellido'){
-      var data = {apellido_persona: obj.inf};
-      var possible = true;
-    }
-    if (obj.columna == 'Direccion'){
-      var data = {direccion_persona: obj.inf};
-      var possible = true;
-    }
-    if (obj.columna == 'Fecha de nacimiento'){
-      var data = {fecha_nacimiento: obj.inf};
-      var possible = true;
-    }
-    if (obj.columna == 'Tipo'){
-      var data = {tipo_persona: obj.inf};
-      var possible = true;
-    }
+    if (validator.isNumeric(obj.id)){
+      var id = obj.id;
+      if (obj.columna == 'Identificacion'){
+        var data = {id_persona: obj.inf};
+        var possible = true;
+      }
+      if (obj.columna == 'Nombre'){
+        var data = {nombre_persona: obj.inf};
+        var possible = true;
+      }
+      if (obj.columna == 'Apellido'){
+        var data = {apellido_persona: obj.inf};
+        var possible = true;
+      }
+      if (obj.columna == 'Direccion'){
+        var data = {direccion_persona: obj.inf};
+        var possible = true;
+      }
+      if (obj.columna == 'Fecha de nacimiento'){
+        var data = {fecha_nacimiento: obj.inf};
+        var possible = true;
+      }
+      if (obj.columna == 'Tipo'){
+        var data = {tipo_persona: obj.inf};
+        var possible = true;
+      }
 
-    if (possible == true){
-    up = 'UPDATE Persona SET ? WHERE id_persona = ?';
-      connection.query(up, [data, id],function(err,result){
-        if(err){
-          throw err;
-        }
-        console.log("se realizo la actualizacion");
-      });
+      if (possible == true){
+        up = 'UPDATE Persona SET ? WHERE id_persona = ?';
+        connection.query(up, [data, id],function(err,result){
+          if(err){
+            throw err;
+          }
+          console.log("se realizo la actualizacion");
+        });
+      }
+    }else {
+      console.log("error en identificacion");
     }
     //vuelve a cargar la pagina con datos actualizados
     consult = 'SELECT * FROM Persona';
@@ -210,12 +215,16 @@ router.post('/update_person',function(req,res,next){
 router.post('/delete_person',function(req,res,next){
   try {
     var obj = req.body;
-    delet = 'DELETE FROM Persona WHERE id_persona = ?';
-    connection.query(delet,obj.id,function(err, res){
-      if(err){
-        throw err;
-      }
-    });
+    if (validator.isNumeric(obj.id)){
+      delet = 'DELETE FROM Persona WHERE id_persona = ?';
+      connection.query(delet,obj.id,function(err, res){
+        if(err){
+          throw err;
+        }
+      });
+    } else {
+      console.log("error en identificacion");
+    }
     //vuelve a cargar la pagina con datos actualizados
     consult = 'SELECT * FROM Persona';
     connection.query(consult,function(err,result){
@@ -238,61 +247,69 @@ router.post('/register_mult',function(req,res,next){
   try {
     var obj = req.body;
 
-    var id = obj.id.replace(/[^0-9]/g, '');
-    //datos y conexion a la tabla persona
-    if (obj.person == 'no' ){
-      var data_person = {id_persona: id, nombre_persona: obj.name, apellido_persona: obj.last_name, direccion_persona: obj.dir, fecha_nacimiento: obj.date_person, tipo_persona: obj.tipo};
-      ins = 'INSERT INTO Persona SET ?';
-      connection.query(ins,data_person,function(err, res){
-        if(err){
-          throw err;
-        }
-        console.log("insercion completa en persona");
-      });
-    }
-
-    //datos y conexion a la tabla de vehiculo, solo si el auto participo en la multa
-    if (obj.vehiculo == 'si'){
-      var id_vehi = obj.matricula;
-      var data_vehi = {matricula_vehiculo: obj.matricula, modelo_vehiculo: obj.modelo, marca_vehiculo: obj.marca, fecha_matricula: obj.date_vehi, id_propietario: id};
-      ins2 = 'INSERT INTO Vehiculo SET ?';
-      connection.query(ins2,data_vehi,function(err, res){
-        if(err){
-          throw err;
-        }
-        console.log("insercion completa en vehiculo");
-      });
-    } else{
-      var id_vehi = null;
-      var data_vehi = {};
-      console.log("No tuvo que agregar vehiculo");
-    }
-
-    //datos y conexion para lugar de infraccion y multa
-    var data_lugar_infracion = {carretera_lugarInfraccion: obj.carretera, kilometro_lugarInfraccion: obj.km, dir_lugarInfraccion: obj.dir_mult};
-    ins3 = 'INSERT INTO Lugar_Infraccion SET ?';
-    connection.query(ins3,data_lugar_infracion,function(err, res){
-      if(err){
-        throw err;
+    if (validator.isNumeric(obj.id) && validator.isNumeric(obj.id_agent) && obj.person != null && obj.vehiculo != null){
+      if (obj.person == 'no' && validator.isNumeric(obj.id)){
+        var id = obj.id.replace(/[^0-9]/g, '');
+        var data_person = {id_persona: id, nombre_persona: obj.name, apellido_persona: obj.last_name, direccion_persona: obj.dir, fecha_nacimiento: obj.date_person, tipo_persona: obj.tipo};
+        ins = 'INSERT INTO Persona SET ?';
+        connection.query(ins,data_person,function(err, res){
+          if(err){
+            throw err;
+          }
+          console.log("insercion completa en persona");
+        });
+      }else{
+        var id = obj.id.replace(/[^0-9]/g, '');
       }
-      console.log("Inserccion completa en lugar de infraccion");
-      var id_lugar = res.insertId;
-      var data_mult = {fecha_multa: obj.date_mult, importe_multa: obj.importe, id_persona: id, id_vehiculo: id_vehi, id_lugarInfraccion: id_lugar, id_agente: obj.id_agent };
-      ins4 = 'INSERT INTO Multa SET ?';
-      connection.query(ins4,data_mult,function(err, res){
+
+      //datos y conexion a la tabla de vehiculo, solo si el auto participo en la multa
+      if (obj.vehiculo == 'si' && validator.isNumeric(obj.matricula)){
+        var id_vehi = obj.matricula;
+        var data_vehi = {matricula_vehiculo: obj.matricula, modelo_vehiculo: obj.modelo, marca_vehiculo: obj.marca, fecha_matricula: obj.date_vehi, id_propietario: id};
+        ins2 = 'INSERT INTO Vehiculo SET ?';
+        connection.query(ins2,data_vehi,function(err, res){
+          if(err){
+            throw err;
+          }
+          console.log("insercion completa en vehiculo");
+        });
+      } else{
+        var id_vehi = null;
+        var data_vehi = {};
+        console.log("No tuvo que agregar vehiculo ó matricula de vehiculo mal escrito");
+      }
+
+      //datos y conexion para lugar de infraccion y multa
+      var data_lugar_infracion = {carretera_lugarInfraccion: obj.carretera, kilometro_lugarInfraccion: obj.km, dir_lugarInfraccion: obj.dir_mult};
+      ins3 = 'INSERT INTO Lugar_Infraccion SET ?';
+      connection.query(ins3,data_lugar_infracion,function(err, res){
         if(err){
           throw err;
         }
-        console.log("insercion completa en Multa");
+        console.log("Inserccion completa en lugar de infraccion");
+        var id_lugar = res.insertId;
+        var data_mult = {fecha_multa: obj.date_mult, importe_multa: obj.importe,articulo_multa: obj.articulo, id_persona: id, id_vehiculo: id_vehi, id_lugarInfraccion: id_lugar, id_agente: obj.id_agent };
+        ins4 = 'INSERT INTO Multa SET ?';
+        connection.query(ins4,data_mult,function(err, res){
+          if(err){
+            throw err;
+          }
+          console.log("insercion completa en Multa");
+        });
       });
-    });
-    res.render('register_mult');
+      res.render('register_mult');
+
+    }else {
+      console.log("error al ingresar el id del agente o de la persona");
+      res.render('register_mult');
+    }
   }
+
   catch (ex) {
     console.error("Internal error:" + ex);
     return next(ex);
   }
-});
+  });
 
 //Pagina root
 router.post('/root',function(req,res,next){
