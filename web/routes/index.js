@@ -1,19 +1,19 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
-
+const { USER_DB, PASS_DB, DB_NAME, HOST } = require('../config');
 
 /*------------ DATABASE CONNECTION ----------------*/
 var connection = mysql.createConnection({
-  host : 'localhost',
-  user : 'root',
-  password : 'ander1096',
-  database : 'C_infracciones'
+  host : HOST,
+  user : USER_DB,
+  password : PASS_DB,
+  database : DB_NAME
 });
 
 connection.connect(function(err,res){
   if(err){
-    throw err;
+    console.log('Base de datos no conectada');
   }else{
     console.log('Conexion establecida');
   }
